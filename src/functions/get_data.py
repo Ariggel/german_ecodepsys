@@ -106,6 +106,12 @@ def download_raw(table_id : str, year_start : int = 2020, year_end : int = 2025,
         logger.critical('API request failed: %s', data_raw_request.status_code)
         raise exceptions.DataDownloadError(f"Failed to download data: {e}")
 
+    if data_raw_request.status_code != 200:
+        raise exceptions.DataDownloadError(
+            f"API unavailable, status {data_raw_request.status_code}: "
+            f"{data_raw_request.text[:200]}"
+        )
+
     try:
         data_raw_bytes = io.BytesIO(data_raw_request.content)
         data_raw_zipped = zipfile.ZipFile(data_raw_bytes)
